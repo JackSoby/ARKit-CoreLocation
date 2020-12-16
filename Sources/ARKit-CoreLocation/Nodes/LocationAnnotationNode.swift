@@ -21,7 +21,7 @@ open class LocationAnnotationNode: LocationNode {
     public var annotationHeightAdjustmentFactor = 1.1
 
     public init(location: CLLocation?, image: UIImage) {
-        let plane = SCNPlane(width: image.size.width / 100, height: image.size.height / 100)
+        let plane = SCNPlane(width: image.size.width / 500, height: image.size.height / 500)
         plane.firstMaterial?.diffuse.contents = image
         plane.firstMaterial?.lightingModel = .constant
 
