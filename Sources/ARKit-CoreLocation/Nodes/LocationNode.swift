@@ -157,7 +157,7 @@ open class LocationNode: SCNNode {
     internal func getPosition(setup: Bool, position: SCNVector3, locationNodeLocation: CLLocation,
                                    locationManager: SceneLocationManager) -> SCNVector3 {
         guard let location = locationManager.currentLocation else {
-            return 0.0
+            return SCNVector3(x:0, y:0,z:0)
         }
 
         // Position is set to a position coordinated via the current position
@@ -167,36 +167,26 @@ open class LocationNode: SCNNode {
         locationTranslation.altitudeTranslation = ignoreAltitude ? 0 : locationTranslation.altitudeTranslation
 
         let adjustedDistance: CLLocationDistance
-        if locationConfirmed && (distance > 100 || continuallyAdjustNodePositionWhenWithinRange || setup) {
-            if distance > 100 {
-                //If the item is too far away, bring it closer and scale it down
-                let scale = 100 / Float(distance)
+     
+        if distance > 100 {
+            //If the item is too far away, bring it closer and scale it down
+            let scale = 100 / Float(distance)
 
-                adjustedDistance = distance * Double(scale)
 
-                let adjustedTranslation = SCNVector3( x: Float(locationTranslation.longitudeTranslation) * scale,
-                                                      y: Float(locationTranslation.altitudeTranslation) * scale,
-                                                      z: Float(locationTranslation.latitudeTranslation) * scale)
-                return = SCNVector3( x: position.x + adjustedTranslation.x,
-                                            y: position.y + adjustedTranslation.y,
-                                            z: position.z - adjustedTranslation.z)
-                // self.scale = SCNVector3(x: scale, y: scale, z: scale)
-            } else {
-                adjustedDistance = distance
-                return = SCNVector3( x: position.x + Float(locationTranslation.longitudeTranslation),
-                                            y: position.y + Float(locationTranslation.altitudeTranslation),
-                                            z: position.z - Float(locationTranslation.latitudeTranslation))
-                // self.scale = SCNVector3(x: 1, y: 1, z: 1)
-            }
+            let adjustedTranslation = SCNVector3( x: Float(locationTranslation.longitudeTranslation) * scale,
+                                                    y: Float(locationTranslation.altitudeTranslation) * scale,
+                                                    z: Float(locationTranslation.latitudeTranslation) * scale)
+            return SCNVector3( x: position.x + adjustedTranslation.x,
+                                        y: position.y + adjustedTranslation.y,
+                                        z: position.z - adjustedTranslation.z)
+            // self.scale = SCNVector3(x: scale, y: scale, z: scale)
         } else {
-            //Calculates distance based on the distance within the scene, as the location isn't yet confirmed
-            //TODO: This yields zero, perhaps we should investigate
-            return Double(position.distance(to: position))
-
-            scale = SCNVector3(x: 1, y: 1, z: 1)
+            return SCNVector3( x: position.x + Float(locationTranslation.longitudeTranslation),
+                                        y: position.y + Float(locationTranslation.altitudeTranslation),
+                                        z: position.z - Float(locationTranslation.latitudeTranslation))
         }
 
-        // return adjustedDistance
+
     }
 
     /// See `LocationAnnotationNode`'s override of this function. Because it doesn't invoke `super`'s version, any changes
@@ -227,7 +217,7 @@ open class LocationNode: SCNNode {
     func getCurrentPosition(setup: Bool = false, scenePosition: SCNVector3?, locationNodeLocation nodeLocation: CLLocation,
                                 locationManager: SceneLocationManager) -> SCNVector3 {
         guard let position = scenePosition, locationManager.currentLocation != nil else {
-            return
+            return SCNVector3(x:0, y:0,z:0)
         }
 
         SCNTransaction.begin()
