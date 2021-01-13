@@ -278,7 +278,7 @@ public extension SceneLocationView {
 
     public func getNodePosition(locationNode: LocationNode) ->  SCNVector3 {
         if locationNode.location == nil || locationNode.locationConfirmed == false {
-            return
+            return SCNVector3(x:0, y:0,z:0)
         }
 
         let locationNodeLocation = locationOfLocationNode(locationNode)
