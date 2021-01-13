@@ -276,7 +276,7 @@ public extension SceneLocationView {
         sceneNode?.addChildNode(locationNode)
     }
 
-    func getNodePosition(locationNode: LocationNode) {
+    public func getNodePosition(locationNode: LocationNode) ->  SCNVector3 {
         if locationNode.location == nil || locationNode.locationConfirmed == false {
             return
         }
