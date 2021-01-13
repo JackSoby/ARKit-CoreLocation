@@ -283,7 +283,7 @@ public extension SceneLocationView {
 
         let locationNodeLocation = locationOfLocationNode(locationNode)
 
-        let position = locationNode.updatePositionAndScale(setup: true,
+        let position = locationNode.getCurrentPosition(setup: true,
                                             scenePosition: currentScenePosition, locationNodeLocation: locationNodeLocation,
                                             locationManager: sceneLocationManager) {
                                                 self.locationViewDelegate?

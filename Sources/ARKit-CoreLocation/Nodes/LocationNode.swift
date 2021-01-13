@@ -113,7 +113,7 @@ open class LocationNode: SCNNode {
         guard let location = locationManager.currentLocation else {
             return 0.0
         }
-q
+
         // Position is set to a position coordinated via the current position
         let distance = self.location(locationManager.bestLocationEstimate).distance(from: location)
 
@@ -131,16 +131,16 @@ q
                 let adjustedTranslation = SCNVector3( x: Float(locationTranslation.longitudeTranslation) * scale,
                                                       y: Float(locationTranslation.altitudeTranslation) * scale,
                                                       z: Float(locationTranslation.latitudeTranslation) * scale)
-                return  SCNVector3( x: position.x + adjustedTranslation.x,
+                self.position = SCNVector3( x: position.x + adjustedTranslation.x,
                                             y: position.y + adjustedTranslation.y,
                                             z: position.z - adjustedTranslation.z)
-                // self.scale = SCNVector3(x: scale, y: scale, z: scale)
+                self.scale = SCNVector3(x: scale, y: scale, z: scale)
             } else {
                 adjustedDistance = distance
-                return self.position = SCNVector3( x: position.x + Float(locationTranslation.longitudeTranslation),
+                self.position = SCNVector3( x: position.x + Float(locationTranslation.longitudeTranslation),
                                             y: position.y + Float(locationTranslation.altitudeTranslation),
                                             z: position.z - Float(locationTranslation.latitudeTranslation))
-                // self.scale = SCNVector3(x: 1, y: 1, z: 1)
+                self.scale = SCNVector3(x: 1, y: 1, z: 1)
             }
         } else {
             //Calculates distance based on the distance within the scene, as the location isn't yet confirmed
@@ -148,8 +148,52 @@ q
             adjustedDistance = Double(position.distance(to: position))
 
             scale = SCNVector3(x: 1, y: 1, z: 1)
-         return adjustedDistance
+        }
 
+        return adjustedDistance
+    }
+
+
+    internal func getPosition(setup: Bool, position: SCNVector3, locationNodeLocation: CLLocation,
+                                   locationManager: SceneLocationManager) -> SCNVector3 {
+        guard let location = locationManager.currentLocation else {
+            return 0.0
+        }
+
+        // Position is set to a position coordinated via the current position
+        let distance = self.location(locationManager.bestLocationEstimate).distance(from: location)
+
+        var locationTranslation = location.translation(toLocation: locationNodeLocation)
+        locationTranslation.altitudeTranslation = ignoreAltitude ? 0 : locationTranslation.altitudeTranslation
+
+        let adjustedDistance: CLLocationDistance
+        if locationConfirmed && (distance > 100 || continuallyAdjustNodePositionWhenWithinRange || setup) {
+            if distance > 100 {
+                //If the item is too far away, bring it closer and scale it down
+                let scale = 100 / Float(distance)
+
+                adjustedDistance = distance * Double(scale)
+
+                let adjustedTranslation = SCNVector3( x: Float(locationTranslation.longitudeTranslation) * scale,
+                                                      y: Float(locationTranslation.altitudeTranslation) * scale,
+                                                      z: Float(locationTranslation.latitudeTranslation) * scale)
+                return = SCNVector3( x: position.x + adjustedTranslation.x,
+                                            y: position.y + adjustedTranslation.y,
+                                            z: position.z - adjustedTranslation.z)
+                // self.scale = SCNVector3(x: scale, y: scale, z: scale)
+            } else {
+                adjustedDistance = distance
+                return = SCNVector3( x: position.x + Float(locationTranslation.longitudeTranslation),
+                                            y: position.y + Float(locationTranslation.altitudeTranslation),
+                                            z: position.z - Float(locationTranslation.latitudeTranslation))
+                // self.scale = SCNVector3(x: 1, y: 1, z: 1)
+            }
+        } else {
+            //Calculates distance based on the distance within the scene, as the location isn't yet confirmed
+            //TODO: This yields zero, perhaps we should investigate
+            return Double(position.distance(to: position))
+
+            scale = SCNVector3(x: 1, y: 1, z: 1)
         }
 
         // return adjustedDistance
@@ -171,11 +215,33 @@ q
 
         childNodes.first?.renderingOrder = renderingOrder(fromDistance: distance)
 
-        let pos = self.adjustedDistance(setup: setup, position: position,
+        _ = self.adjustedDistance(setup: setup, position: position,
                                   locationNodeLocation: nodeLocation, locationManager: locationManager)
 
-     return pos
+        SCNTransaction.commit()
 
+        onCompletion()
+    }
+
+
+    func getCurrentPosition(setup: Bool = false, scenePosition: SCNVector3?, locationNodeLocation nodeLocation: CLLocation,
+                                locationManager: SceneLocationManager) -> SCNVector3 {
+        guard let position = scenePosition, locationManager.currentLocation != nil else {
+            return
+        }
+
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = setup ? 0.0 : 0.1
+
+        let distance = self.location(locationManager.bestLocationEstimate).distance(from:
+            locationManager.currentLocation ?? nodeLocation)
+
+        childNodes.first?.renderingOrder = renderingOrder(fromDistance: distance)
+
+       let pos = self.getPosition(setup: setup, position: position,
+                                  locationNodeLocation: nodeLocation, locationManager: locationManager)
+
+        return pos
     }
 
     /// Converts distance from meters to SCNKit rendering order
