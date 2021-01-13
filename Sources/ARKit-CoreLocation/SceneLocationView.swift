@@ -276,6 +276,24 @@ public extension SceneLocationView {
         sceneNode?.addChildNode(locationNode)
     }
 
+    func getNodePosition(locationNode: LocationNode) {
+        if locationNode.location == nil || locationNode.locationConfirmed == false {
+            return
+        }
+
+        let locationNodeLocation = locationOfLocationNode(locationNode)
+
+        let position = locationNode.updatePositionAndScale(setup: true,
+                                            scenePosition: currentScenePosition, locationNodeLocation: locationNodeLocation,
+                                            locationManager: sceneLocationManager) {
+                                                self.locationViewDelegate?
+                                                    .didUpdateLocationAndScaleOfLocationNode(sceneLocationView: self,
+                                                                                             locationNode: locationNode)
+        }
+
+        return position
+    }
+
     @objc func sceneLocationViewTouched(sender: UITapGestureRecognizer) {
         guard let touchedView = sender.view as? SCNView else {
             return

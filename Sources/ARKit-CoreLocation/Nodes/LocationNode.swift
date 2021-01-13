@@ -113,7 +113,7 @@ open class LocationNode: SCNNode {
         guard let location = locationManager.currentLocation else {
             return 0.0
         }
-
+q
         // Position is set to a position coordinated via the current position
         let distance = self.location(locationManager.bestLocationEstimate).distance(from: location)
 
@@ -131,16 +131,16 @@ open class LocationNode: SCNNode {
                 let adjustedTranslation = SCNVector3( x: Float(locationTranslation.longitudeTranslation) * scale,
                                                       y: Float(locationTranslation.altitudeTranslation) * scale,
                                                       z: Float(locationTranslation.latitudeTranslation) * scale)
-                self.position = SCNVector3( x: position.x + adjustedTranslation.x,
+                return  SCNVector3( x: position.x + adjustedTranslation.x,
                                             y: position.y + adjustedTranslation.y,
                                             z: position.z - adjustedTranslation.z)
-                self.scale = SCNVector3(x: scale, y: scale, z: scale)
+                // self.scale = SCNVector3(x: scale, y: scale, z: scale)
             } else {
                 adjustedDistance = distance
-                self.position = SCNVector3( x: position.x + Float(locationTranslation.longitudeTranslation),
+                return self.position = SCNVector3( x: position.x + Float(locationTranslation.longitudeTranslation),
                                             y: position.y + Float(locationTranslation.altitudeTranslation),
                                             z: position.z - Float(locationTranslation.latitudeTranslation))
-                self.scale = SCNVector3(x: 1, y: 1, z: 1)
+                // self.scale = SCNVector3(x: 1, y: 1, z: 1)
             }
         } else {
             //Calculates distance based on the distance within the scene, as the location isn't yet confirmed
@@ -148,9 +148,11 @@ open class LocationNode: SCNNode {
             adjustedDistance = Double(position.distance(to: position))
 
             scale = SCNVector3(x: 1, y: 1, z: 1)
+         return adjustedDistance
+
         }
 
-        return adjustedDistance
+        // return adjustedDistance
     }
 
     /// See `LocationAnnotationNode`'s override of this function. Because it doesn't invoke `super`'s version, any changes
@@ -169,12 +171,11 @@ open class LocationNode: SCNNode {
 
         childNodes.first?.renderingOrder = renderingOrder(fromDistance: distance)
 
-        _ = self.adjustedDistance(setup: setup, position: position,
+        let pos = self.adjustedDistance(setup: setup, position: position,
                                   locationNodeLocation: nodeLocation, locationManager: locationManager)
 
-        SCNTransaction.commit()
+     return pos
 
-        onCompletion()
     }
 
     /// Converts distance from meters to SCNKit rendering order
