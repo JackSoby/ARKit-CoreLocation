@@ -31,9 +31,9 @@ open class LocationAnnotationNode: LocationNode {
 
         super.init(location: location)
 
-        let billboardConstraint = SCNBillboardConstraint()
-        billboardConstraint.freeAxes = SCNBillboardAxis.Y
-        constraints = [billboardConstraint]
+        // let billboardConstraint = SCNBillboardConstraint()
+        // billboardConstraint.freeAxes = SCNBillboardAxis.Y
+        // constraints = [billboardConstraint]
 
         addChildNode(annotationNode)
     }
@@ -61,9 +61,9 @@ open class LocationAnnotationNode: LocationNode {
 
         super.init(location: location)
 
-        let billboardConstraint = SCNBillboardConstraint()
-        billboardConstraint.freeAxes = SCNBillboardAxis.Y
-        constraints = [billboardConstraint]
+        // let billboardConstraint = SCNBillboardConstraint()
+        // billboardConstraint.freeAxes = SCNBillboardAxis.Y
+        // constraints = [billboardConstraint]
 
         addChildNode(annotationNode)
     }
